@@ -15,6 +15,11 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 # Add an executable target
 add_executable(${PROJECT_NAME} src/colorsnap.cpp src/utils.cpp)
 
+# Install the executable
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+    install(TARGETS ${PROJECT_NAME} DESTINATION /usr/bin/)
+endif()
+
 # Specify the C++ standard to use
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
