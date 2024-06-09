@@ -60,7 +60,7 @@ so you can pipe it with other commands to make it useful. Or you can just copy a
 
 ## License
 
-This project is licensed under the MIT License. See the `LICENSE` file for more details.
+This project is licensed under the MIT License. See the [LICENSE](https://github.com/Louai99k/colorsnap/blob/master/LICENSE) file for more details.
 
 ## Contributing
 
