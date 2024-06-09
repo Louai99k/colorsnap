@@ -27,6 +27,10 @@ ColorSnap is a command-line tool designed to extract the most prominent colors f
    ```sh
    ./build.sh
    ```
+3. If you get a (Permission denied) message you need to run this before the build command:
+   ```sh
+   chmod +x ./build.sh
+   ```
 
 ## Usage
 
