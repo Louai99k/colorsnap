@@ -25,7 +25,6 @@ ColorSnap is a command-line tool designed to extract the most prominent colors f
 2. **Build the Project:**
    There is a script called `build.sh` that is shipped with the project. You just need to call it.
    ```sh
-   cd /colorsnap/download/path
    ./build.sh
    ```
 
