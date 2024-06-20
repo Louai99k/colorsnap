@@ -9,8 +9,9 @@ int main(int argc, char **argv) {
   auto filename = args.filename;
 
   // read the image
-  int x, y, n;
-  unsigned char *image_data = stbi_load(filename, &x, &y, &n, 0);
+  int image_width, image_height, image_channels;
+  unsigned char *image_data =
+      stbi_load(filename, &image_width, &image_height, &image_channels, 0);
 
   if (image_data == nullptr) {
     std::cerr << "Error reading image"
@@ -21,11 +22,12 @@ int main(int argc, char **argv) {
 
   // get the required data for clustering algorithm
   auto colors_map =
-      get_colors_count_map(image_data, x, y, n, args.color_distance_threshold);
+      get_colors_count_map(image_data, image_width, image_height,
+                           image_channels, args.color_distance_threshold);
   auto top_colors = get_top_colors(colors_map, args.color_palette_size);
 
-  for (const auto &el : top_colors) {
-    std::cout << el.first << "\n";
+  for (const auto &color : top_colors) {
+    std::cout << color.first << "\n";
   }
 
   // free image data

@@ -16,13 +16,17 @@ Args parse_args(int argc, char **argv) {
 
   char *filename = argv[1];
 
+  // check for filename if it's provided or not
   if (argv[1] == nullptr) {
     std::cerr << "No File Name Provided"
               << "\n";
     exit(1);
   }
+  // store filename
   args.filename = argv[1];
 
+  // check if the color palette size is provided and valid or not. if not then
+  // set it to default palette size
   bool invalid_color_palette_size = false;
   if (argv[2] == nullptr) {
     invalid_color_palette_size = true;
@@ -38,6 +42,9 @@ Args parse_args(int argc, char **argv) {
     args.color_palette_size = DEFAULT_COLOR_PALETTE_SIZE;
   }
 
+  // the color distance threshold represents how much the colors should be far
+  // from each other on hue wheel. do the same as palette size if not provided
+  // or if it's invalid
   bool invalid_color_distance_threshold = false;
   if (argv[3] == nullptr) {
     invalid_color_distance_threshold = true;
@@ -119,39 +126,47 @@ Color rgb_to_color(int r, int g, int b) {
 
 std::unordered_map<std::string, int>
 get_colors_count_map(unsigned char *image_data, int image_width,
-                     int image_height, int image_channels_count,
+                     int image_height, int image_channels,
                      double color_distance_threshold) {
 
   std::unordered_map<std::string, int> colors_map;
   double min_hue_diff = 10.0 * color_distance_threshold;
   double min_lumination_diff = 0.1 * color_distance_threshold;
 
-  int image_size = image_width * image_height * image_channels_count;
+  int image_size = image_width * image_height * image_channels;
   for (unsigned char *p = image_data; p != image_data + image_size;
-       p += image_channels_count) {
-    // get the rgb data
+       p += image_channels) {
+    // Extract the RGB values from the current pixel
     int r = (int)p[0];
     int g = (int)p[1];
     int b = (int)p[2];
 
+    // Convert the RGB values to a color object with HSL and hex representations
     Color color = rgb_to_color(r, g, b);
 
     if (colors_map.find(color.hex) != colors_map.end()) {
+      // If the color is already in the map, increment its count
       colors_map[color.hex] += 1;
     } else {
       bool is_valid = true;
-      for (auto &el : colors_map) {
-        RGB rgb = hex_to_rgb(el.first);
+      // Check if the current color is sufficiently unique compared to the
+      // colors already in the map
+      for (auto &hex_count_pair : colors_map) {
+        RGB rgb = hex_to_rgb(hex_count_pair.first);
         HSL hsl = rgb_to_hsl(rgb.r, rgb.g, rgb.b);
         double h_diff = std::abs(hsl.h - color.hsl.h);
         double l_diff = std::abs(hsl.l - color.hsl.l);
+        // Determine if the current color is too similar to any existing color
+        // in the map by comparing their hue and lumination differences against
+        // thresholds
         if (h_diff < min_hue_diff && l_diff < min_lumination_diff) {
           is_valid = false;
-          el.second += 1;
+          hex_count_pair.second += 1;
           break;
         }
       }
 
+      // If the current color is unique enough, add it to the map
       if (is_valid) {
         colors_map[color.hex] = 1;
       }
@@ -166,17 +181,19 @@ get_top_colors(const std::unordered_map<std::string, int> colors_map,
                int color_palette_size) {
 
   std::vector<std::pair<std::string, int>> top_colors;
-  top_colors.reserve(colors_map.size());
 
-  for (const auto &el : colors_map) {
-    top_colors.emplace_back(el);
+  // transform colors from map to vector to be able to sort it later
+  for (const auto &hex_count_pair : colors_map) {
+    top_colors.push_back(hex_count_pair);
   }
 
+  // sort the vector based on the count of the colors
   std::sort(
       top_colors.begin(), top_colors.end(),
       [](const std::pair<std::string, int> &a,
          const std::pair<std::string, int> &b) { return a.second > b.second; });
 
+  // resize the vector so it match how much the user want colors in his palette
   if (top_colors.size() > color_palette_size) {
     top_colors.resize(color_palette_size);
   }
