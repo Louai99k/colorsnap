@@ -24,4 +24,4 @@ endif()
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 # Include directories
-include_directories(includes headers)
+include_directories(include lib)
