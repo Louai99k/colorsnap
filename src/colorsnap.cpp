@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   int x, y, n;
   unsigned char *image_data = stbi_load(filename, &x, &y, &n, 0);
 
-  if (image_data == NULL) {
+  if (image_data == nullptr) {
     std::cerr << "Error reading image"
               << "\n";
 

@@ -16,7 +16,7 @@ Args parse_args(int argc, char **argv) {
 
   char *filename = argv[1];
 
-  if (argv[1] == NULL) {
+  if (argv[1] == nullptr) {
     std::cerr << "No File Name Provided"
               << "\n";
     exit(1);
@@ -24,7 +24,7 @@ Args parse_args(int argc, char **argv) {
   args.filename = argv[1];
 
   bool invalid_color_palette_size = false;
-  if (argv[2] == NULL) {
+  if (argv[2] == nullptr) {
     invalid_color_palette_size = true;
   } else {
     try {
@@ -39,7 +39,7 @@ Args parse_args(int argc, char **argv) {
   }
 
   bool invalid_color_distance_threshold = false;
-  if (argv[3] == NULL) {
+  if (argv[3] == nullptr) {
     invalid_color_distance_threshold = true;
   } else {
     try {
