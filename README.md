@@ -17,19 +17,38 @@ ColorSnap is a command-line tool designed to extract the most prominent colors f
 ## Installation
 
 1. **Clone the Repository:**
+
    ```sh
    git clone https://github.com/Louai99k/colorsnap.git
    cd colorsnap
    ```
+   
+2. **Make `build.sh` executable:**
 
-2. **Build the Project:**
-   There is a script called `build.sh` that is shipped with the project. You just need to call it.
+   There is a script called `build.sh` that is shipped with the project. Run this command to make it executable.
+   ```sh
+   chmod +x ./build.sh
+   ```
+   
+3. **Build the Project:**
+   
    ```sh
    ./build.sh
    ```
-3. If you get a (Permission denied) message you need to run this before the build command:
+   
+   #### After this, a folder called `release` will be created and you will see the binary file called `colorsnap` inside it. If you want to install the binary in your `/usr/bin` folder to call it from anywhere in the system you can follow the next steps otherwise ignore them.
+
+4. **Navigate to the `release` folder:**
+   
    ```sh
-   chmod +x ./build.sh
+   cd release/
+   ```
+   
+5. **Install the binary:**
+
+   Run the following command and the binary should be installed on the `/usr/bin` folder
+   ```sh
+   sudo make install
    ```
 
 ## Usage
