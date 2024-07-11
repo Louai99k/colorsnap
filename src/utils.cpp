@@ -1,6 +1,6 @@
 #include "utils.h"
+#include "CLI11/CLI11.hpp"
 #include <algorithm>
-#include <exception>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -12,53 +12,35 @@ const double DEFAULT_COLOR_DISTANCE_THRESHOLD = 2.0;
 const int DEFAULT_COLOR_PALETTE_SIZE = 8;
 
 Args parse_args(int argc, char **argv) {
+  // define the app
+  CLI::App app{"Tool to help you get colors from images"};
+  argv = app.ensure_utf8(argv);
+
   Args args;
 
-  char *filename = argv[1];
+  std::string filename;
+  app.add_option("-f,--file", filename, "The file path on the system")
+      ->required();
 
-  // check for filename if it's provided or not
-  if (argv[1] == nullptr) {
-    std::cerr << "No File Name Provided"
-              << "\n";
-    exit(1);
-  }
-  // store filename
-  args.filename = argv[1];
+  int color_palette_size = DEFAULT_COLOR_PALETTE_SIZE;
+  app.add_option("-s,--size", color_palette_size,
+                 "The size of the color's palette");
 
-  // check if the color palette size is provided and valid or not. if not then
-  // set it to default palette size
-  bool invalid_color_palette_size = false;
-  if (argv[2] == nullptr) {
-    invalid_color_palette_size = true;
-  } else {
-    try {
-      args.color_palette_size = std::stoi(argv[2]);
-    } catch (const std::exception &e) {
-      invalid_color_palette_size = true;
-    }
+  double color_distance_threshold = DEFAULT_COLOR_DISTANCE_THRESHOLD;
+  app.add_option("-r,--threshold", color_distance_threshold,
+                 "The value of how much the colors should be far from each "
+                 "other on the hue wheel");
+
+  // Parse the command-line arguments
+  try {
+    app.parse(argc, argv);
+  } catch (const CLI::ParseError &e) {
+    exit(app.exit(e));
   }
 
-  if (invalid_color_palette_size) {
-    args.color_palette_size = DEFAULT_COLOR_PALETTE_SIZE;
-  }
-
-  // the color distance threshold represents how much the colors should be far
-  // from each other on hue wheel. do the same as palette size if not provided
-  // or if it's invalid
-  bool invalid_color_distance_threshold = false;
-  if (argv[3] == nullptr) {
-    invalid_color_distance_threshold = true;
-  } else {
-    try {
-      args.color_distance_threshold = std::stod(argv[3]);
-    } catch (const std::exception &e) {
-      invalid_color_distance_threshold = true;
-    }
-  }
-
-  if (invalid_color_distance_threshold) {
-    args.color_distance_threshold = DEFAULT_COLOR_DISTANCE_THRESHOLD;
-  }
+  args.filename = filename;
+  args.color_palette_size = color_palette_size;
+  args.color_distance_threshold = color_distance_threshold;
 
   return args;
 }

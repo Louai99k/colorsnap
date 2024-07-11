@@ -18,7 +18,7 @@ struct Color {
 };
 
 struct Args {
-  char *filename;
+  std::string filename;
   int color_palette_size;
   double color_distance_threshold;
 };

@@ -4,14 +4,13 @@
 #include "stb_image/stb_image.h"
 
 int main(int argc, char **argv) {
-  // retrieve args
-  auto args = parse_args(argc, argv);
-  auto filename = args.filename;
+  // parse the app's args
+  Args args = parse_args(argc, argv);
 
   // read the image
   int image_width, image_height, image_channels;
-  unsigned char *image_data =
-      stbi_load(filename, &image_width, &image_height, &image_channels, 0);
+  unsigned char *image_data = stbi_load(args.filename.c_str(), &image_width,
+                                        &image_height, &image_channels, 0);
 
   if (image_data == nullptr) {
     std::cerr << "Error reading image"
