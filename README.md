@@ -53,21 +53,24 @@ ColorSnap is a command-line tool designed to extract the most prominent colors f
 
 ## Usage
 
-Run the `colorsnap` executable with the required arguments:
+Run the `colorsnap` executable with the required options:
 ```sh
-colorsnap <filename> [<color_palette_size>] [<color_distance_threshold>]
+colorsnap -f <filename> [-s|--size color_palette_size] [-r|--threshold color_threshold] [-d|--darkness darkness_multiplier] 
 ```
 
-- `<filename>`: The path to the image file.
-- `<color_palette_size>` (optional): The number of top colors to extract. Default is 8.
-- `<color_distance_threshold>` (optional): The threshold for color clustering. Default is 2.0.
+### Available options
+
+- `-f, --file`: The path to the image file.
+- `-s, --size` (optional): The number of top colors to extract. Default is 8.
+- `-r, --threshold` (optional): The threshold for color clustering. Default is 2.0.
+- `-d, --darkness` (optional): This is an option that accepts values between -1 and 1. Values less than zero will make the colors lighter by the precentage you apply. values greater than zero will make the colors darker. Default is 0.0.
 
 ### Example
 
 ```sh
-colorsnap ./image.jpg 5 1.5
+colorsnap -f ./image.jpg -s 5 --threshold 1.5 -d 0.1
 ```
-This command processes `image.jpg`, extracting the top 5 colors with a clustering threshold of 1.5.
+This command processes `image.jpg`, extracting the top 5 colors with a clustering threshold of 1.5 and make the color darker by 10%.
 
 It will output the following:
 ```
@@ -88,3 +91,4 @@ Contributions are welcome! Please feel free to submit a pull request or open an 
 ## Acknowledgments
 
 - [STB Image Library](https://github.com/nothings/stb) for image loading functionality.
+- [CLI11 Library](https://github.com/CLIUtils/CLI11) for parsing the args.
