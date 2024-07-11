@@ -21,6 +21,7 @@ struct Args {
   std::string filename;
   int color_palette_size;
   double color_distance_threshold;
+  double darkness_multiplier;
 };
 
 Args parse_args(int, char **);
@@ -32,4 +33,4 @@ Color rgb_to_color(int, int, int);
 std::unordered_map<std::string, int> get_colors_count_map(unsigned char *, int,
                                                           int, int, double);
 std::vector<std::pair<std::string, int>>
-get_top_colors(const std::unordered_map<std::string, int>, int);
+get_top_colors(const std::unordered_map<std::string, int>, int, double);

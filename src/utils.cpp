@@ -9,6 +9,7 @@
 #include <vector>
 
 const double DEFAULT_COLOR_DISTANCE_THRESHOLD = 2.0;
+const double DEFAULT_DARKNESS_MULTIPLIER = 0.0;
 const int DEFAULT_COLOR_PALETTE_SIZE = 8;
 
 Args parse_args(int argc, char **argv) {
@@ -31,6 +32,11 @@ Args parse_args(int argc, char **argv) {
                  "The value of how much the colors should be far from each "
                  "other on the hue wheel");
 
+  double darkness_multiplier = DEFAULT_DARKNESS_MULTIPLIER;
+  app.add_option("-d,--darkness", darkness_multiplier,
+                 "This value determines how much the colors should be darkened "
+                 "or lightened");
+
   // Parse the command-line arguments
   try {
     app.parse(argc, argv);
@@ -41,6 +47,7 @@ Args parse_args(int argc, char **argv) {
   args.filename = filename;
   args.color_palette_size = color_palette_size;
   args.color_distance_threshold = color_distance_threshold;
+  args.darkness_multiplier = std::clamp(darkness_multiplier, -1.0, 1.0);
 
   return args;
 }
@@ -106,6 +113,42 @@ Color rgb_to_color(int r, int g, int b) {
   return {rgb, hsl, hex};
 }
 
+RGB hsl_to_rgb(double h, double s, double l) {
+  double c = (1 - std::abs(2 * l - 1)) * s;
+  double x = c * (1 - std::abs(std::fmod(h / 60.0, 2) - 1));
+  double m = l - c / 2;
+
+  double r, g, b;
+  if (h >= 0 && h < 60) {
+    r = c;
+    g = x;
+    b = 0;
+  } else if (h >= 60 && h < 120) {
+    r = x;
+    g = c;
+    b = 0;
+  } else if (h >= 120 && h < 180) {
+    r = 0;
+    g = c;
+    b = x;
+  } else if (h >= 180 && h < 240) {
+    r = 0;
+    g = x;
+    b = c;
+  } else if (h >= 240 && h < 300) {
+    r = x;
+    g = 0;
+    b = c;
+  } else {
+    r = c;
+    g = 0;
+    b = x;
+  }
+
+  return {static_cast<int>((r + m) * 255), static_cast<int>((g + m) * 255),
+          static_cast<int>((b + m) * 255)};
+}
+
 std::unordered_map<std::string, int>
 get_colors_count_map(unsigned char *image_data, int image_width,
                      int image_height, int image_channels,
@@ -160,7 +203,7 @@ get_colors_count_map(unsigned char *image_data, int image_width,
 
 std::vector<std::pair<std::string, int>>
 get_top_colors(const std::unordered_map<std::string, int> colors_map,
-               int color_palette_size) {
+               int color_palette_size, double darkness_multiplier) {
 
   std::vector<std::pair<std::string, int>> top_colors;
 
@@ -178,6 +221,28 @@ get_top_colors(const std::unordered_map<std::string, int> colors_map,
   // resize the vector so it match how much the user want colors in his palette
   if (top_colors.size() > color_palette_size) {
     top_colors.resize(color_palette_size);
+  }
+
+  // In here we are applying darkness filter on the chosen colors
+  // if the darkness_multiplier value is greated than 0 then the colors will get
+  // dimmer if the darkness_multiplier value is less than 0 then the colors will
+  // get lighter
+  if (darkness_multiplier != 0.0) {
+    for (size_t i = 0; i < color_palette_size; i++) {
+      // getting HSL
+      auto hex_count_pair = top_colors[i];
+      RGB rgb = hex_to_rgb(hex_count_pair.first);
+      HSL hsl = rgb_to_hsl(rgb.r, rgb.g, rgb.b);
+
+      // changing illumination
+      double new_l = hsl.l - hsl.l * darkness_multiplier;
+      new_l = std::clamp(new_l, 0.0, 1.0);
+
+      // return to hex and assign it
+      RGB new_rgb = hsl_to_rgb(hsl.h, hsl.s, new_l);
+      std::string new_hex = rgb_to_hex(new_rgb.r, new_rgb.g, new_rgb.b);
+      top_colors[i].first = new_hex;
+    }
   }
 
   return top_colors;

@@ -23,7 +23,8 @@ int main(int argc, char **argv) {
   auto colors_map =
       get_colors_count_map(image_data, image_width, image_height,
                            image_channels, args.color_distance_threshold);
-  auto top_colors = get_top_colors(colors_map, args.color_palette_size);
+  auto top_colors = get_top_colors(colors_map, args.color_palette_size,
+                                   args.darkness_multiplier);
 
   for (const auto &color : top_colors) {
     std::cout << color.first << "\n";
